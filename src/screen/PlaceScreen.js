@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Alert, Button, Modal, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import Pressable from 'react-native/Libraries/Components/Pressable/Pressable';
+
 import { openDatabase } from 'react-native-sqlite-storage';
+import { useNavigation } from '@react-navigation/native';
 
 import CardCounter from '../components/CardCounter';
 
@@ -15,6 +17,8 @@ const db = openDatabase(
 );
 
 export default function PlaceScreen({route}) {
+  const navigation = useNavigation();
+
   const [modalVisible, setModalVisible] = useState(false);
   const [countPeopleWalk, setCountPeopleWalk] = useState(0);
   const [countPeopleStop, setCountPeopleStop] = useState(0);
@@ -105,8 +109,9 @@ export default function PlaceScreen({route}) {
       setCountPeopleStop(0);
       setCountMotorcycleStop(0);
       setCountMotorcycleRun(0);
-      setLocation('')
-      setTime('')
+      setLocation('');
+      setTime('');
+      navigation.navigate('Home');
     } catch (err) {
       console.log(err);
     }

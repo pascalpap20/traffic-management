@@ -7,6 +7,7 @@ import PlaceScreen from './src/screen/PlaceScreen';
 import TrafficScreen from './src/screen/TrafficScreen';
 import SurveyScreen from './src/screen/SurveyScreen';
 import BepScreen from './src/screen/BepScreen';
+import ReviewScreen from './src/screen/ReviewScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -49,6 +50,14 @@ export default function App() {
         <Stack.Screen 
           name='Bep'  
           component={BepScreen}
+          options={{
+            headerShown: false
+          }}
+        />
+        
+        <Stack.Screen 
+          name='Review'  
+          component={ReviewScreen}
           options={{
             headerShown: false
           }}

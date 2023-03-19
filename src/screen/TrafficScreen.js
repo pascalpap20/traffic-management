@@ -17,12 +17,19 @@ const db = openDatabase(
 export default function TrafficScreen({route}) {
   const navigation = useNavigation();
   
-  const navigate = (title) => {
-      navigation.navigate(title);
+  const navigate = (title, data = []) => {
+    console.log(data)
+      if (data.length > 0) {
+        navigation.navigate(title, { ids: data });
+      } else {
+        navigation.navigate(title);
+      }
   }
 
   const [header, setHeader] = useState(['Kategori', 'Lokasi', 'Jam', 'Motor Jalan', 'Motor Berhenti', 'Orang Jalan', 'Orang Berhenti']);
   const [data, setData] = useState([]);
+  const [placeFilter, setPlaceFilter] = useState('');
+  const [selectedData, setSelectedData] = useState([]);
   const [widthArr, setWidthArr] = useState([100, 100, 100, 100, 100, 100, 100]);
 
   const getTrafficData = ()  => {
@@ -60,20 +67,44 @@ export default function TrafficScreen({route}) {
     }
   }
 
+  const selectData = (recordIndex, placeFilter) => {
+    if (selectedData.includes(recordIndex)) {
+      // Kalo udh ada berarti di keluarin indexnya (ga dipilih lagi)
+      const currentData = selectedData.filter((item, idx) => item !== recordIndex);
+      setSelectedData(currentData);
+    } else {
+      setSelectedData([...selectedData, recordIndex]);
+      setPlaceFilter(placeFilter)
+    }
+  }
+
   useEffect(() => {
     getTrafficData();
   }, []);
 
-  const element = (cellData, index, records) => (
-    <View style={{ flexDirection: 'row' }}>
-      <Text>{cellData}</Text>
-      <TouchableOpacity onPress={() => {console.log(records[index][7])}}>
-        <View style={{ width: 58, height: 18, backgroundColor: '#78B7BB',  borderRadius: 2 }}>
-          <Text style={{ textAlign: 'center', color: '#fff' }}>button</Text>
-        </View>
-      </TouchableOpacity>
-    </View>
-  );
+  const element = (cellData, index, records, placeFilter, place, countSelectedData) => {
+    if (placeFilter === '' || countSelectedData <= 0) {
+      return (
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Text>{cellData}</Text>
+          <TouchableOpacity onPress={() => {selectData(records[index][7], place)}}>
+            <View style={{ width: 30, height: 30, backgroundColor: '#78B7BB',  borderRadius: 2, justifyContent: 'center' }}>
+              <Text style={{ textAlign: 'center', color: '#fff' }}>+</Text>
+            </View>
+          </TouchableOpacity>
+        </View>)
+    } else if (placeFilter === place) {
+      return (
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Text>{cellData}</Text>
+          <TouchableOpacity onPress={() => {selectData(records[index][7], place)}}>
+            <View style={{ width: 30, height: 30, backgroundColor: '#78B7BB',  borderRadius: 2, justifyContent: 'center' }}>
+              <Text style={{ textAlign: 'center', color: '#fff' }}>+</Text>
+            </View>
+          </TouchableOpacity>
+        </View>)
+    }
+  };
 
   return (
     <View 
@@ -102,7 +133,7 @@ export default function TrafficScreen({route}) {
             <Button 
               title='Review'
               color={'#213A23'}
-              onPress={() => navigate('Review')}
+              onPress={() => navigate('Review', selectedData)}
               />
         </View>
       </View>
@@ -117,12 +148,16 @@ export default function TrafficScreen({route}) {
               <Table borderStyle={{borderWidth: 2, borderColor: '#c8e1ff'}}>
                 {
                 data.map((rowData, index) => (
-                  <TableWrapper key={index} style={{ flexDirection: 'row', backgroundColor: '#FFF1C1' }}>
+                  <TableWrapper key={index} style={{ flexDirection: 'row', backgroundColor: (selectedData.includes(rowData[7])) ? '#FFF1C1' : '#FFFFFF' }}>
                     {
                       rowData
                         .filter((data, idx) => idx !== 7) // Hilangin kolom idnya
                         .map((cellData, cellIndex, records) => (
-                          <Cell key={cellIndex} data={(cellIndex === 6) ? element(cellData, index, data) : cellData} style={{ width: 100}}/>
+                          <Cell 
+                            key={cellIndex} 
+                            style={{ width: 100}}
+                            data={(cellIndex === 6) ? element(cellData, index, data, placeFilter, rowData[0], selectedData.length) : cellData} 
+                            />
                       ))
                     }
                   </TableWrapper>
