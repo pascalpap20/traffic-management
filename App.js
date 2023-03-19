@@ -4,6 +4,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import HomeScreen from './src/screen/HomeScreen';
 import PlaceScreen from './src/screen/PlaceScreen';
+import TrafficScreen from './src/screen/TrafficScreen';
+import SurveyScreen from './src/screen/SurveyScreen';
+import BepScreen from './src/screen/BepScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -22,6 +25,30 @@ export default function App() {
         <Stack.Screen 
           name='Place'  
           component={PlaceScreen}
+          options={{
+            headerShown: false
+          }}
+        />
+        
+        <Stack.Screen 
+          name='Traffic'  
+          component={TrafficScreen}
+          options={{
+            headerShown: false
+          }}
+        />
+        
+        <Stack.Screen 
+          name='Survey'  
+          component={SurveyScreen}
+          options={{
+            headerShown: false
+          }}
+        />
+        
+        <Stack.Screen 
+          name='Bep'  
+          component={BepScreen}
           options={{
             headerShown: false
           }}

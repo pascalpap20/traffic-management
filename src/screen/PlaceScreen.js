@@ -1,8 +1,18 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Alert, Button, Modal, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import Pressable from 'react-native/Libraries/Components/Pressable/Pressable';
+import { openDatabase } from 'react-native-sqlite-storage';
 
 import CardCounter from '../components/CardCounter';
+
+const db = openDatabase(
+  {
+    name: 'traffic',
+    location:'default',
+  }, 
+  () => {},
+  error => { console.log(error) }
+);
 
 export default function PlaceScreen({route}) {
   const [modalVisible, setModalVisible] = useState(false);
@@ -12,6 +22,95 @@ export default function PlaceScreen({route}) {
   const [countMotorcycleRun, setCountMotorcycleRun] = useState(0);
   const [location, setLocation] = useState('')
   const [time, setTime] = useState('')
+
+  const createTable = () => {
+    try {
+      db.transaction(txn => {
+        txn.executeSql(
+          `
+            CREATE TABLE IF NOT EXISTS places (
+              id                      INTEGER PRIMARY KEY AUTOINCREMENT,
+              created_at              DATE,
+              updated_at              DATE,
+              category                VARCHAR(64),
+              count_motorcycle_run    INT,
+              count_motorcycle_stop   INT,
+              location                VARCHAR(64),
+              people_stop             INT,
+              people_walk             INT,
+              time                    TEXT
+            );
+
+            CREATE TABLE IF NOT EXISTS reviews(
+              id                            INTEGER PRIMARY KEY AUTOINCREMENT,
+              created_at                    DATE,
+              updated_at                    DATE,
+              count_car                     INT,
+              count_motorcycle              INT,
+              estimated_customer            DECIMAL(12,3),
+              estimated_monthly_liter       DECIMAL(12,3),
+              estimated_monthly_turnover    DECIMAL(12,3),
+              estimated_weekday_liter       DECIMAL(12,3),
+              estimated_weekday_turnover    DECIMAL(12,3),
+              estimated_weekend_liter       DECIMAL(12,3),
+              estimated_weekend_turnover    DECIMAL(12,3),
+              people_stop                   INT,
+              people_walk                   INT,
+              percentage                    DECIMAL(3,3),
+              price_range                   DECIMAL(12,3)
+            );
+            
+            CREATE TABLE IF NOT EXISTS competitors(
+              id                INTEGER PRIMARY KEY AUTOINCREMENT,
+              review_id         INT,
+              created_at        DATE,
+              updated_at        DATE,
+              turnover          DECIMAL(12,3),
+              name              TEXT,
+              price_range       DECIMAL(12,3),
+              tc                INT
+              PRIMARY KEY (id),
+              FOREIGN KEY (review_id) 
+                REFERENCES reviews (id) 
+                    ON DELETE CASCADE 
+                    ON UPDATE NO ACTION
+            );
+          `,
+          [],
+          () => {},
+          error => console.log(error)
+        )
+      })
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  useEffect(() => {
+    createTable();
+  }, []);
+
+  const createPlaces = (category, count_motorcycle_run, count_motorcycle_stop, location, people_stop, people_walk, time) => {
+    try {
+      db.transaction(async txn => {
+        await txn.executeSql(
+          "INSERT INTO places ('created_at', 'updated_at', 'category', 'count_motorcycle_run', 'count_motorcycle_stop', 'location', 'people_stop', 'people_walk', 'time') VALUES (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?)",
+          [category, count_motorcycle_run, count_motorcycle_stop, location, people_stop, people_walk, time],
+          () => {},
+          error => console.log(error)
+        )
+      });
+
+      setCountPeopleWalk(0);
+      setCountPeopleStop(0);
+      setCountMotorcycleStop(0);
+      setCountMotorcycleRun(0);
+      setLocation('')
+      setTime('')
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   const styles = StyleSheet.create({
     container: {
@@ -101,7 +200,10 @@ export default function PlaceScreen({route}) {
                 <View style={{ flexDirection: 'row' }}>
                   <Pressable
                     style={[styles.button, styles.buttonYes]}
-                    onPress={() => setModalVisible(!modalVisible)}
+                    onPress={() => {
+                      createPlaces(route.params.title, countMotorcycleRun, countMotorcycleStop, location, countPeopleStop, countPeopleWalk, time);
+                      setModalVisible(!modalVisible)
+                    }}
                   >
                     <Text style={styles.textStyle}>Yes</Text>
                   </Pressable>

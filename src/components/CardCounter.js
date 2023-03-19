@@ -26,7 +26,8 @@ export default function CardCounter(props) {
         },
         title: {
           fontSize: (place === 'Mall') ? 30: 16,
-          textAlign: 'center'
+          textAlign: 'center',
+          marginTop: 5
         },
         counter: {
           marginTop: 10,
@@ -34,10 +35,10 @@ export default function CardCounter(props) {
         },
         input: {
           height: 40,
-          marginTop: 42,
+          marginTop: (place === 'Mall') ? 42 : 12,
           marginBottom: 12,
           marginRight: 24,
-          marginleft: 12,
+        //   marginLeft: 12,
           borderWidth: 1,
           width: (place === 'Mall') ? 180: 140,
           padding: 10,
