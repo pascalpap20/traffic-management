@@ -17,10 +17,10 @@ const db = openDatabase(
 export default function TrafficScreen({route}) {
   const navigation = useNavigation();
   
-  const navigate = (title, data = []) => {
-    console.log(data)
+  const navigate = (title, data = [], placeFilter = '') => {
       if (data.length > 0) {
-        navigation.navigate(title, { ids: data });
+        navigation.navigate(title, { ids: data, place: placeFilter });
+        setSelectedData([]);
       } else {
         navigation.navigate(title);
       }
@@ -103,6 +103,11 @@ export default function TrafficScreen({route}) {
             </View>
           </TouchableOpacity>
         </View>)
+    } else {
+      return (
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Text>{cellData}</Text>
+        </View>)
     }
   };
 
@@ -133,7 +138,7 @@ export default function TrafficScreen({route}) {
             <Button 
               title='Review'
               color={'#213A23'}
-              onPress={() => navigate('Review', selectedData)}
+              onPress={() => navigate('Review', selectedData, placeFilter)}
               />
         </View>
       </View>
