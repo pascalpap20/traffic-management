@@ -34,15 +34,27 @@ export default function TrafficScreen({route}) {
   const [countMotorcycleRun, setCountMotorcycleRun] = useState(0);
   const [percentage, setPercentage] = useState(0);
   const [competitors, setCompetitors] = useState([
-    { name: '', price_range: '', tc: '', turnover: '', tc2: '', turnover2: '',},
-    { name: '', price_range: '', tc: '', turnover: '', tc2: '', turnover2: '',},
-    { name: '', price_range: '', tc: '', turnover: '', tc2: '', turnover2: '',},
-    { name: '', price_range: '', tc: '', turnover: '', tc2: '', turnover2: '',},
-    { name: '', price_range: '', tc: '', turnover: '', tc2: '', turnover2: '',},
-    { name: '', price_range: '', tc: '', turnover: '', tc2: '', turnover2: '',},
-    { name: '', price_range: '', tc: '', turnover: '', tc2: '', turnover2: '',},
-    { name: '', price_range: '', tc: '', turnover: '', tc2: '', turnover2: '',},
+    { name: '', price_range: '', tc: 0, turnover: '', tc2: 0, turnover2: '',},
+    { name: '', price_range: '', tc: 0, turnover: '', tc2: 0, turnover2: '',},
+    { name: '', price_range: '', tc: 0, turnover: '', tc2: 0, turnover2: '',},
+    { name: '', price_range: '', tc: 0, turnover: '', tc2: 0, turnover2: '',},
+    { name: '', price_range: '', tc: 0, turnover: '', tc2: 0, turnover2: '',},
+    { name: '', price_range: '', tc: 0, turnover: '', tc2: 0, turnover2: '',},
+    { name: '', price_range: '', tc: 0, turnover: '', tc2: 0, turnover2: '',},
+    { name: '', price_range: '', tc: 0, turnover: '', tc2: 0, turnover2: '',},
   ]);
+
+  const [pDay, setPDay] = useState('');
+  const [pEnd, setPEnd] = useState('');
+  const [p, setP] = useState('');
+  const [turnoverWeekday, setTurnoverWeekday] = useState('');
+  const [turnoverWeekend, setTurnoverWeekend] = useState('');
+  const [turnoverDaily, setTurnoverDaily] = useState('');
+  const [turnoverMonthly, setTurnoverMonthly] = useState('');
+  const [literWeekday, setLiterWeekday] = useState('');
+  const [literWeekend, setLiterWeekend] = useState('');
+  const [literDaily, setLiterDaily] = useState('');
+  const [literMonthly, setLiterMonthly] = useState('');
 
   const getData = () => {
     try {
@@ -91,20 +103,48 @@ export default function TrafficScreen({route}) {
   };
 
   const getReviewFeasibility = () => {
-    let estimatedWeekdayBuyer
-    let estimatedWeekendBuyer
-    let estimatedBuyer
-    let priceRange
-    let estimatedWeekdayTurnover
-    let estimatedWeekendTurnover
-    let estimatedDailyTurnover
-    let estimatedMonthlyTurnover
-    let estimatedWeekdayLiter
-    let estimatedWeekendLiter
-    let estimatedDailyLiter
-    let estimatedMonthlyLiter
+    // Total TC competitor
+    let totalTCWeekday = competitors.reduce(((acc, val) => acc + Number(val.tc)), 0);
+    let totalTCWeekend = competitors.reduce(((acc, val) => acc + Number(val.tc2)), 0);
 
-    console.log(competitors)
+    let estimatedWeekdayBuyer = totalTCWeekday * (percentage / 100);
+    let estimatedWeekendBuyer = totalTCWeekend * (percentage / 100);
+    let estimatedBuyer = countPeopleStop + countMotorcycleStop;
+    let priceRangeBottom = 10000;
+    let priceRangeTop = 20000;
+
+    let estimatedWeekdayTurnover = estimatedWeekdayBuyer * priceRangeBottom;
+    let estimatedWeekdayTurnover2 = estimatedWeekdayBuyer * priceRangeTop;
+    let estimatedWeekendTurnover = estimatedWeekendBuyer * priceRangeBottom; 
+    let estimatedWeekendTurnover2 = estimatedWeekendBuyer * priceRangeTop; 
+    let estimatedDailyTurnover = estimatedBuyer * priceRangeBottom;
+    let estimatedDailyTurnover2 = estimatedBuyer * priceRangeTop;
+    let estimatedMonthlyTurnover = (route.params.place == 'Stand Alone') ? estimatedBuyer * priceRangeBottom * 30 : (((estimatedWeekdayBuyer * priceRangeBottom) * 22) + ((estimatedWeekendBuyer * priceRangeBottom) * 8));
+    let estimatedMonthlyTurnover2 = (route.params.place == 'Stand Alone') ? estimatedBuyer * priceRangeTop * 30 : (((estimatedWeekdayBuyer * priceRangeTop) * 22) + ((estimatedWeekendBuyer * priceRangeTop) * 8));
+    let estimatedWeekdayLiter = estimatedWeekdayBuyer * 0.2;
+    let estimatedWeekdayLiter2 = estimatedWeekdayBuyer * 0.3;
+    let estimatedWeekendLiter = estimatedWeekendBuyer * 0.2;
+    let estimatedWeekendLiter2 = estimatedWeekendBuyer * 0.3;
+    let estimatedDailyLiter = estimatedBuyer * 0.2
+    let estimatedDailyLiter2 = estimatedBuyer * 0.3
+    let estimatedMonthlyLiter = (route.params.place == 'Stand Alone') ? estimatedBuyer * 0.2 * 30 : ((estimatedWeekdayBuyer * 0.2) * 22) + ((estimatedWeekendBuyer * 0.2) * 0.8);
+    let estimatedMonthlyLiter2 = (route.params.place == 'Stand Alone') ? estimatedBuyer * 0.3 * 30 : ((estimatedWeekdayBuyer * 0.3) * 22) + ((estimatedWeekendBuyer * 0.3) * 0.8);
+
+    setPDay(`${estimatedWeekdayBuyer}`);
+    setPEnd(`${estimatedWeekendBuyer}`);
+    setP(`${estimatedBuyer}`);
+    setTurnoverWeekday(`${parseFloat(estimatedWeekdayTurnover).toFixed(2)} - ${parseFloat(estimatedWeekdayTurnover2).toFixed(2)}`);
+    setTurnoverWeekend(`${parseFloat(estimatedWeekendTurnover).toFixed(2)} - ${parseFloat(estimatedWeekendTurnover2).toFixed(2)}`);
+    setTurnoverDaily(`${parseFloat(estimatedDailyTurnover).toFixed(2)} - ${parseFloat(estimatedDailyTurnover2).toFixed(2)}`);
+    setTurnoverMonthly(`${parseFloat(estimatedMonthlyTurnover).toFixed(2)} - ${parseFloat(estimatedMonthlyTurnover2).toFixed(2)}`);
+    setLiterWeekday(`${parseFloat(estimatedWeekdayLiter).toFixed(2)} - ${parseFloat(estimatedWeekdayLiter2).toFixed(2)}`);
+    setLiterWeekend(`${parseFloat(estimatedWeekendLiter).toFixed(2)} - ${parseFloat(estimatedWeekendLiter2).toFixed(2)}`);
+    setLiterDaily(`${parseFloat(estimatedDailyLiter).toFixed(2)} - ${parseFloat(estimatedDailyLiter2).toFixed(2)}`);
+    setLiterMonthly(`${parseFloat(estimatedMonthlyLiter).toFixed(2)} - ${parseFloat(estimatedMonthlyLiter2).toFixed(2)}`);
+  }
+
+  const handleSave = () => {
+    console.log('SAVE')
   }
 
   useEffect(() => {
@@ -159,7 +199,7 @@ export default function TrafficScreen({route}) {
             style={[styles.button]}
             onPress={() => navigate('Traffic')}
           >
-            <Text style={styles.textStyle}>Back</Text>
+            <Text style={[styles.textStyle, { color: 'white' }]}>Back</Text>
           </Pressable>
 
           <View
@@ -291,39 +331,39 @@ export default function TrafficScreen({route}) {
                   style={[styles.input]}
                   onChangeText={(newValue) => handleInputChange(idx, newValue, 'name')}
                   value={record.name}
-                  placeholder="Nama"
+                  // placeholder="Nama"
               />
               <TextInput 
                   style={[styles.input]}
                   onChangeText={(newValue) => handleInputChange(idx, newValue, 'price_range')}
                   value={record.price_range}
-                  placeholder="Range Harga"
+                  // placeholder="Range Harga"
               />
               <TextInput 
                   style={[styles.input, { width: 30 }]}
                   onChangeText={(newValue) => handleInputChange(idx, newValue, 'tc')}
                   value={record.tc}
-                  placeholder="TC"
+                  // placeholder="TC"
                   keyboardType='number-pad'
               />
               <TextInput 
                   style={[styles.input, { width: 60 }]}
                   onChangeText={(newValue) => handleInputChange(idx, newValue, 'turnover')}
                   value={record.turnover}
-                  placeholder="Turnover"
+                  // placeholder="Turnover"
               />
               <TextInput 
                   style={[styles.input, { width: 30 }]}
                   onChangeText={(newValue) => handleInputChange(idx, newValue, 'tc2')}
                   value={record.tc2}
-                  placeholder="TC"
+                  // placeholder="TC"
                   keyboardType='number-pad'
               />
               <TextInput 
                   style={[styles.input, { width: 60 }]}
                   onChangeText={(newValue) => handleInputChange(idx, newValue, 'turnover2')}
                   value={record.turnover2}
-                  placeholder="Turnover"
+                  // placeholder="Turnover"
               />
             </View>)}
         </ScrollView>
@@ -363,7 +403,7 @@ export default function TrafficScreen({route}) {
         <Text>Review Feasibility</Text>
         <View
           style={{
-            width: 300,
+            width: 340,
             // height: 200,  
             // backgroundColor: 'blue',
             borderStyle: 'dashed',
@@ -381,14 +421,16 @@ export default function TrafficScreen({route}) {
               <Text style={{
                   marginRight: 20,
                   marginLeft: 10,
-                  marginTop: 10
+                  marginTop: 10,
+                  fontSize: 12
                 }}
               >Estimasi Pembeli Weekday</Text>
               <Text style={{
-                  marginRight: 20,
-                  marginTop: 10
+                  marginRight: 5,
+                  marginTop: 10,
+                  fontSize: 9
                 }}
-              >{countMotorcycleRun}</Text>
+              >{pDay}</Text>
             </View>}
 
           {route.params.place == 'Mall' &&
@@ -400,13 +442,15 @@ export default function TrafficScreen({route}) {
             >
               <Text style={{
                   marginRight: 20,
-                  marginLeft: 10
+                  marginLeft: 10,
+                  fontSize: 12
                 }}
               >Estimasi Pembeli Weekend</Text>
               <Text style={{
-                  marginRight: 20
+                  marginRight: 5,
+                  fontSize: 9
                 }}
-              >{countMotorcycleStop}</Text>
+              >{pEnd}</Text>
             </View>}
 
           {route.params.place == 'Stand Alone' &&
@@ -419,14 +463,16 @@ export default function TrafficScreen({route}) {
               <Text style={{
                   marginRight: 20,
                   marginLeft: 10,
-                  marginTop: 10
+                  marginTop: 10,
+                  fontSize: 12
                 }}
               >Estimasi Pembeli</Text>
               <Text style={{
-                  marginRight: 20,
-                  marginTop: 10
+                  marginRight: 5,
+                  marginTop: 10,
+                  fontSize: 12
                 }}
-              >{countMotorcycleStop}</Text>
+              >{p}</Text>
             </View>}
             
           <View
@@ -437,13 +483,15 @@ export default function TrafficScreen({route}) {
           >
             <Text style={{
                 marginRight: 20,
-                marginLeft: 10
+                marginLeft: 10,
+                fontSize: 12
               }}
             >Range Harga</Text>
             <Text style={{
-                marginRight: 20
+                marginRight: 5,
+                fontSize: 12
               }}
-            >{countMotorcycleStop}</Text>
+            >10.000 - 20.000</Text>
           </View>
 
           {route.params.place == 'Mall' &&
@@ -455,13 +503,15 @@ export default function TrafficScreen({route}) {
             >
               <Text style={{
                   marginRight: 20,
-                  marginLeft: 10
+                  marginLeft: 10,
+                  fontSize: 12
                 }}
               >Estimasi Omset Weekday</Text>
               <Text style={{
-                  marginRight: 20
+                  marginRight: 5,
+                  fontSize: 12
                 }}
-              >{countMotorcycleStop}</Text>
+              >{turnoverWeekday}</Text>
             </View>}
 
           {route.params.place == 'Mall' &&
@@ -473,13 +523,15 @@ export default function TrafficScreen({route}) {
             >
               <Text style={{
                   marginRight: 20,
-                  marginLeft: 10
+                  marginLeft: 10,
+                  fontSize: 12
                 }}
               >Estimasi Omset Weekend</Text>
               <Text style={{
-                  marginRight: 20
+                  marginRight: 5,
+                  fontSize: 12
                 }}
-              >{countMotorcycleStop}</Text>
+              >{turnoverWeekend}</Text>
             </View>}
 
           {route.params.place == 'Stand Alone' &&
@@ -491,84 +543,15 @@ export default function TrafficScreen({route}) {
             >
               <Text style={{
                   marginRight: 20,
-                  marginLeft: 10
+                  marginLeft: 10,
+                  fontSize: 12
                 }}
               >Estimasi Omseet Harian</Text>
               <Text style={{
-                  marginRight: 20
+                  marginRight: 5,
+                  fontSize: 12
                 }}
-              >{countMotorcycleStop}</Text>
-            </View>}
-
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between' 
-            }}
-          >
-            <Text style={{
-                marginRight: 20,
-                marginLeft: 10
-              }}
-            >Estimasi Omset Bulanan</Text>
-            <Text style={{
-                marginRight: 20
-              }}
-            >{countMotorcycleStop}</Text>
-          </View>
-
-          {route.params.place == 'Mall' &&
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between' 
-              }}
-            >
-              <Text style={{
-                  marginRight: 20,
-                  marginLeft: 10
-                }}
-              >Estimasi Liter Weekday</Text>
-              <Text style={{
-                  marginRight: 20
-                }}
-              >{countMotorcycleStop}</Text>
-            </View>}
-
-          {route.params.place == 'Mall' &&
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between' 
-              }}
-            >
-              <Text style={{
-                  marginRight: 20,
-                  marginLeft: 10
-                }}
-              >Estimasi Liter Weekend</Text>
-              <Text style={{
-                  marginRight: 20
-                }}
-              >{countMotorcycleStop}</Text>
-            </View>}
-
-          {route.params.place == 'Stand Alone' &&
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between' 
-              }}
-            >
-              <Text style={{
-                  marginRight: 20,
-                  marginLeft: 10
-                }}
-              >Estimasi Liter Harian</Text>
-              <Text style={{
-                  marginRight: 20
-                }}
-              >{countMotorcycleStop}</Text>
+              >{turnoverDaily}</Text>
             </View>}
 
           <View
@@ -580,15 +563,121 @@ export default function TrafficScreen({route}) {
             <Text style={{
                 marginRight: 20,
                 marginLeft: 10,
-                marginBottom: 10
+                fontSize: 12
+              }}
+            >Estimasi Omset Bulanan</Text>
+            <Text style={{
+                marginRight: 5,
+                fontSize: 12
+              }}
+            >{turnoverMonthly}</Text>
+          </View>
+
+          {route.params.place == 'Mall' &&
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between' 
+              }}
+            >
+              <Text style={{
+                  marginRight: 20,
+                  marginLeft: 10,
+                  fontSize: 12
+                }}
+              >Estimasi Liter Weekday</Text>
+              <Text style={{
+                  marginRight: 5,
+                  fontSize: 12
+                }}
+              >{literWeekday}</Text>
+            </View>}
+
+          {route.params.place == 'Mall' &&
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between' 
+              }}
+            >
+              <Text style={{
+                  marginRight: 20,
+                  marginLeft: 10,
+                  fontSize: 12
+                }}
+              >Estimasi Liter Weekend</Text>
+              <Text style={{
+                  marginRight: 5,
+                  fontSize: 12
+                }}
+              >{literWeekend}</Text>
+            </View>}
+
+          {route.params.place == 'Stand Alone' &&
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between' 
+              }}
+            >
+              <Text style={{
+                  marginRight: 20,
+                  marginLeft: 10,
+                  fontSize: 12
+                }}
+              >Estimasi Liter Harian</Text>
+              <Text style={{
+                  marginRight: 5,
+                  fontSize: 12
+                }}
+              >{literDaily}</Text>
+            </View>}
+
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between' 
+            }}
+          >
+            <Text style={{
+                marginRight: 20,
+                marginLeft: 10,
+                marginBottom: 10,
+                fontSize: 12
               }}
             >Estimasi Liter Bulanan</Text>
             <Text style={{
-                marginRight: 20,
-                marginBottom: 10
+                marginRight: 5,
+                marginBottom: 10,
+                fontSize: 12
               }}
-            >{countMotorcycleStop}</Text>
+            >{literMonthly}</Text>
           </View>
+        </View>
+        
+        <View style={{
+          alignItems: 'flex-end',
+          // marginRight: 140,
+          marginTop: 5
+        }}>  
+          <Pressable
+            style={{ 
+              width: 60,
+              height: 30,
+              backgroundColor: '#213A23',
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'center'
+            }}
+            onPress={() => handleSave()}
+          >
+            <Text style={{ 
+              color: 'white',
+              textAlign: 'center',
+              justifyContent: 'center',
+              alignSelf: 'center' 
+            }}>Save</Text>
+          </Pressable>
         </View>
       </View>
     </View>
