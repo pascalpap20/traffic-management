@@ -27,6 +27,7 @@ export default function TrafficScreen({route}) {
       setPercentage(0)
   }
 
+  const [modalVisible, setModalVisible] = useState(false);
   const [data, setData] = useState([]);
   const [countPeopleWalk, setCountPeopleWalk] = useState(0);
   const [countPeopleStop, setCountPeopleStop] = useState(0);
@@ -144,7 +145,7 @@ export default function TrafficScreen({route}) {
   }
 
   const handleSave = () => {
-    console.log('SAVE')
+    setModalVisible(true)
   }
 
   useEffect(() => {
@@ -170,7 +171,58 @@ export default function TrafficScreen({route}) {
     },
     textStyle: {
       fontSize: 13
-    }
+    },
+    centeredView: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      // marginTop: 22,   
+      backgroundColor: 'rgba(0,0,0, 0.7)',
+    },
+    modalView: {
+      // margin: 20,
+      backgroundColor: "#fff",
+      borderRadius: 20,
+      padding: 50,
+      opacity: 1,
+      // width: 403,
+      // height: 207,
+      alignItems: "center",
+      shadowColor: "#fff",
+      shadowOffset: {
+        width: 0,
+        height: 2
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      // elevation: 5
+    },
+    modalText: {
+      marginBottom: 30,
+      textAlign: "center",
+      fontSize: 16,
+      fontWeight: 'bold'
+    },
+    buttonYes: {
+      backgroundColor: "#7AFF64",
+    },
+    buttonNo: {
+      backgroundColor: "#FF6464",
+    },
+    buttonModal: {
+      alignSelf: 'flex-end',
+      marginRight: 9,
+      width: 103,
+      height: 53,
+      justifyContent: 'center',
+      borderRadius: 5
+    },
+    textStyleModal: {
+      color: "white",
+      fontWeight: "bold",
+      textAlign: "center",
+      fontSize: 16,
+    },
   });
 
   return (
@@ -182,6 +234,41 @@ export default function TrafficScreen({route}) {
         flexDirection: 'row'
       }}
     >
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          Alert.alert("Modal has been closed.");
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <TouchableOpacity style={styles.centeredView} onPress={() => setModalVisible(!modalVisible)}>
+          <TouchableWithoutFeedback>
+            <View style={styles.modalView}>
+                <Text style={styles.modalText}>Yakin data yang diinput sudah benar?</Text>
+                <View style={{ flexDirection: 'row' }}>
+                  <Pressable
+                    style={[styles.buttonModal, styles.buttonYes]}
+                    onPress={() => {
+                      console.log('Ya')
+                      setModalVisible(!modalVisible)
+                    }}
+                  >
+                    <Text style={styles.textStyleModal}>Yes</Text>
+                  </Pressable>
+
+                  <Pressable
+                    style={[styles.buttonModal, styles.buttonNo]}
+                    onPress={() => setModalVisible(!modalVisible)}
+                  >
+                    <Text style={styles.textStyleModal}>No</Text>
+                  </Pressable>
+                </View>
+            </View>
+          </TouchableWithoutFeedback>
+        </TouchableOpacity>
+      </Modal>
       <View 
         style={{
           flexDirection: 'column',

@@ -188,7 +188,6 @@ export default function PlaceScreen({route}) {
 
   return (
     <View style={styles.container}>
-      {/* <Text>{route.params.title}</Text> */}
       <Modal
         animationType="fade"
         transparent={true}

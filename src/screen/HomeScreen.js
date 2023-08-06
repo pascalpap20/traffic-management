@@ -37,8 +37,8 @@ export default function HomeScreen({ }) {
       </View>
 
       <View style={styles.containerCard}>
-        <Card imageLink={'https://reactjs.org/logo-og.png'} title={'Mall'} navigation/>
-        <Card imageLink={'https://reactjs.org/logo-og.png'} title={'Stand Alone'} navigation/>
+        <Card imageLink={'Mall'} title={'Mall'} navigation/>
+        <Card imageLink={'Stand Alone'} title={'Stand Alone'} navigation/>
       </View>
     </View>
   );

@@ -29,6 +29,7 @@ export default function TrafficScreen({route}) {
   const [header, setHeader] = useState(['Kategori', 'Lokasi', 'Jam', 'Motor Jalan', 'Motor Berhenti', 'Orang Jalan', 'Orang Berhenti']);
   const [data, setData] = useState([]);
   const [placeFilter, setPlaceFilter] = useState('');
+  const [category, setCategory] = useState('');
   const [selectedData, setSelectedData] = useState([]);
   const [widthArr, setWidthArr] = useState([100, 100, 100, 100, 100, 100, 100]);
 
@@ -67,14 +68,17 @@ export default function TrafficScreen({route}) {
     }
   }
 
-  const selectData = (recordIndex, placeFilter) => {
+  const selectData = (recordIndex, placeFilter, recordCategory) => {
     if (selectedData.includes(recordIndex)) {
       // Kalo udh ada berarti di keluarin indexnya (ga dipilih lagi)
       const currentData = selectedData.filter((item, idx) => item !== recordIndex);
       setSelectedData(currentData);
+      setCategory('')
+      setPlaceFilter('')
     } else {
       setSelectedData([...selectedData, recordIndex]);
       setPlaceFilter(placeFilter)
+      setCategory(recordCategory)
     }
   }
 
@@ -87,17 +91,17 @@ export default function TrafficScreen({route}) {
       return (
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <Text>{cellData}</Text>
-          <TouchableOpacity onPress={() => {selectData(records[index][7], place)}}>
+          <TouchableOpacity onPress={() => {selectData(records[index][7], place, records[index][0])}}>
             <View style={{ width: 30, height: 30, backgroundColor: '#78B7BB',  borderRadius: 2, justifyContent: 'center' }}>
               <Text style={{ textAlign: 'center', color: '#fff' }}>+</Text>
             </View>
           </TouchableOpacity>
         </View>)
-    } else if (placeFilter === place) {
+    } else if (placeFilter.toLowerCase() === place.toLowerCase()) {
       return (
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <Text>{cellData}</Text>
-          <TouchableOpacity onPress={() => {selectData(records[index][7], place)}}>
+          <TouchableOpacity onPress={() => {selectData(records[index][7], place, records[index][0])}}>
             <View style={{ width: 30, height: 30, backgroundColor: '#78B7BB',  borderRadius: 2, justifyContent: 'center' }}>
               <Text style={{ textAlign: 'center', color: '#fff' }}>+</Text>
             </View>
@@ -138,7 +142,7 @@ export default function TrafficScreen({route}) {
             <Button 
               title='Review'
               color={'#213A23'}
-              onPress={() => navigate('Review', selectedData, placeFilter)}
+              onPress={() => navigate('Review', selectedData, category)}
               />
         </View>
       </View>
@@ -161,7 +165,7 @@ export default function TrafficScreen({route}) {
                           <Cell 
                             key={cellIndex} 
                             style={{ width: 100}}
-                            data={(cellIndex === 6) ? element(cellData, index, data, placeFilter, rowData[0], selectedData.length) : cellData} 
+                            data={(cellIndex === 6) ? element(cellData, index, data, placeFilter, rowData[1], selectedData.length) : cellData} 
                             />
                       ))
                     }

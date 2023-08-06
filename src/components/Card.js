@@ -8,10 +8,12 @@ export default function Card({imageLink, title}) {
         navigation.navigate('Place', { title });
     }
 
+    
+
     return (
         <TouchableOpacity onPress={navigate}>
             <View style={styles.container}>
-                <Image source={{uri: imageLink}}
+                <Image source={ imageLink == 'Stand Alone' ? require('../images/standalone.png') : require('../images/mall.png')}
                     style={{width: 200, height: 200}} />
                 <Text>{title}</Text>
             </View>
